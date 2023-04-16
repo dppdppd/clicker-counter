@@ -39,24 +39,27 @@ DATA = [];
 // idx - index into entries under counters.
 // wheelidx - index into wheels.
 
-WHEEL_RADIUS = 8;
-WHEEL_THICKNESS = 3.5;
-WHEEL_INSET = WHEEL_THICKNESS/6;
+// OG VALUES
+// WHEEL_RADIUS = 8;
+// WHEEL_THICKNESS = 3.5;
 
-GLYPH_THICKNESS = 0.5;
+
+WHEEL_DIAMETER = 16;
+WHEEL_RADIUS = WHEEL_DIAMETER/2;
+WHEEL_THICKNESS = WHEEL_RADIUS * 0.5;
+WHEEL_INSET = WHEEL_THICKNESS * 0.167;
+GLYPH_THICKNESS = WHEEL_RADIUS * 0.0625;
+WHEEL_AXLE_DIVOT_DIAMETER = WHEEL_RADIUS * 0.375;
+WHEEL_CLICK_DIVOT_DIAMETER = WHEEL_RADIUS * 0.25;
+WHEEL_CLICK_DETENT_DIAMETER = WHEEL_CLICK_DIVOT_DIAMETER;
+WHEEL_CLICK_DETENT_SCALE = 0.20;
+BASE_LABEL_DEPTH = WHEEL_RADIUS * 0.1;
+BASE_ARM_THICKNESS = 2;
 
 TOLERANCE = 0.1;
 
-WHEEL_AXLE_DIVOT_DIAMETER = 3;
-WHEEL_CLICK_DIVOT_DIAMETER = 2;
-WHEEL_CLICK_DETENT_DIAMETER = WHEEL_CLICK_DIVOT_DIAMETER;
-WHEEL_CLICK_DETENT_SCALE = 0.20;
-
 EXTRA_DISTANCE_BETWEEN_DEVICES = WHEEL_RADIUS;
 
-BASE_ARM_THICKNESS = 2;
-
-BASE_LABEL_DEPTH = 0.6;
 
 dbg_wheel = "";
 dbg_basemain = "";
@@ -127,6 +130,8 @@ module Main()
 		MakeDevice( didx );
 	}
 }
+
+BASE_MIN_Z = -WHEEL_RADIUS * 1.18;
 
 module MakeDevice( didx )
 {
@@ -213,9 +218,9 @@ module MakeDevice( didx )
 	function get_device_wheel_font( didx = didx ) = find_value( get_device( didx ), WHEEL_FONT, default = "Liberation Sans:style=Bold");
 	function get_device_default_glyphs( didx = didx ) = find_value( get_device( didx ), GLYPHS, default = ["0","1","2","3","4","5","6","7","8","9"]);
 	function get_device_default_click_strength( didx = didx ) = find_value( get_device( didx ), CLICK_STRENGTH, default = 0);
-	function get_device_default_IS_WHEEL_INNIE( didx = didx ) = find_value( get_device( didx ), IS_WHEEL_INNIE, default = true);
-	function get_device_default_base_label_innie( didx = didx ) = find_value( get_device( didx ), IS_BASE_INNIE, default = true);
-	function get_device_default_extra_width( didx = didx ) = find_value( get_device( didx ), EXTRA_WIDTH, default = 2);
+	function get_device_default_is_wheel_innie( didx = didx ) = find_value( get_device( didx ), IS_WHEEL_INNIE, default = true);
+	function get_device_default_base_label_innie( didx = didx ) = find_value( get_device( didx ), IS_BASE_INNIE, default = false);
+	function get_device_default_extra_width( didx = didx ) = find_value( get_device( didx ), EXTRA_WIDTH, default = 1);
 	function get_device_tab_male( didx = didx ) = find_value( get_device( didx ), MAKE_TAB_MALE, default = false);
 	function get_device_tab_female( didx = didx ) = find_value( get_device( didx ), MAKE_TAB_FEMALE, default = false);
 
@@ -248,7 +253,7 @@ module MakeDevice( didx )
 	function get_wheel_glyphs( elidx, wheelidx ) =  find_value( get_wheel( elidx, wheelidx ), GLYPHS, default = get_device_default_glyphs() );
 	function get_wheel_font( elidx, wheelidx ) = find_value( get_wheel( elidx, wheelidx ), FONT, default = get_device_wheel_font() );
 
-	function get_wheel_glyph_innie( elidx, wheelidx ) = find_value( get_wheel( elidx, wheelidx ), IS_WHEEL_INNIE, default = get_device_default_IS_WHEEL_INNIE() );
+	function get_wheel_glyph_innie( elidx, wheelidx ) = find_value( get_wheel( elidx, wheelidx ), IS_WHEEL_INNIE, default = get_device_default_is_wheel_innie() );
 	function get_wheel_glyph_count( elidx, wheelidx ) = len( get_wheel_glyphs( elidx, wheelidx ));
 	function get_wheel_glyph_distance_from_center( elidx, wheelidx ) = (WHEEL_RADIUS * cos( 180 / (get_wheel_glyph_count( elidx, wheelidx )) ) - GLYPH_THICKNESS);
 	function get_click_distance_from_center( elidx, wheelidx ) = -.65 * WHEEL_RADIUS;
@@ -322,13 +327,11 @@ module MakeDevice( didx )
 		}
 	}
 
-
 	module MakeBaseLabel( elidx )
 	{
-
 		// label
-		translate( [ - get_counter_width( elidx )/2, 9 * WHEEL_RADIUS/8, -8.3 * WHEEL_RADIUS/8 ])
-		rotate([-15.5, 0, 0])
+		translate( [ - get_counter_width( elidx )/2, 9 * WHEEL_RADIUS/8, BASE_MIN_Z + WHEEL_RADIUS * .23 ])
+		rotate([-12, 0, 0])
 		linear_extrude(height = BASE_LABEL_DEPTH, scale = 1 ) 
 		rotate( [ 0,0,180])
 		text( 
@@ -338,8 +341,6 @@ module MakeDevice( didx )
 			size = WHEEL_RADIUS/4.5 * 2,
 			font = get_base_font(elidx));
 	}
-
-
 
 	module MakeBaseForCounter( elidx )
 	{
@@ -374,7 +375,6 @@ module MakeDevice( didx )
 		{
 			BaseLowerPolygon();
 		}
-				
 	}
 
 	module MakeBaseForSingleWheel( elidx, wheelidx )
@@ -503,7 +503,7 @@ module MakeDevice( didx )
 			rotate([angle, 0, 0])
 			translate( [0,-0, z])
 			linear_extrude(height = GLYPH_THICKNESS, scale = 1 ) 
-			resize( [ WHEEL_THICKNESS/4.5 * 3.5, 0, 0 ], auto = true)
+			resize( [ WHEEL_THICKNESS/4.5 * 3, 0, 0 ], auto = true)
 			rotate( [ 0,0,180])
 			text( 
 				text = get_wheel_glyphs( elidx, wheelidx )[side], 
@@ -581,7 +581,7 @@ module MakeDevice( didx )
 		else
 		{
 			// raise it to floor
-			translate( [0,0, WHEEL_RADIUS * 1.3])
+			translate( [0,0, -BASE_MIN_Z])
 			children();
 		}
 	}
@@ -598,7 +598,6 @@ module DbgAxis()
 	}
 }
 
-BASE_MIN_Z = -WHEEL_RADIUS * 1.3;
 
 module BaseLowerPolygon()
 {
@@ -623,8 +622,8 @@ module BaseUpperPolygon()
 module BaseCavityPolygon()
 {
     polygon( points = [
-        [BASE_MIN_Z -WHEEL_RADIUS * .1, -WHEEL_RADIUS * 2],
-        [BASE_MIN_Z -WHEEL_RADIUS * .1, WHEEL_RADIUS * 1.7],
+        [BASE_MIN_Z -WHEEL_RADIUS * .2, -WHEEL_RADIUS * 2],
+        [BASE_MIN_Z -WHEEL_RADIUS * .2, WHEEL_RADIUS * 1.7],
         [ WHEEL_RADIUS * 2, WHEEL_RADIUS * 2]
     ]);   
 }

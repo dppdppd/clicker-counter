@@ -184,6 +184,7 @@ module MakeDevice( didx )
 							MakeExtraWidth( elidx );
 						}
 
+						if ( get_device_make_base() )
 						if ( !is_last_counter( elidx ) )
 						{
 							OrientBaseForPrint()
@@ -246,9 +247,8 @@ module MakeDevice( didx )
 
 	function is_disabled( table ) = find_value( table, DISABLED, default = false);
 	function is_device_disabled( didx ) = is_disabled( get_device( didx));
-	function is_counter_disabled( elidx, didx ) = is_disabled( get_part( elidx, didx = didx));
-	function is_wheel_disabled( elidx, wheelidx, didx ) = is_disabled( get_wheel( elidx, wheelidx, didx = didx));
 
+	function is_wheel_disabled( elidx, wheelidx, didx ) = is_disabled( get_wheel( elidx, wheelidx, didx = didx));
 
 	function get_wheel_glyphs( elidx, wheelidx ) =  find_value( get_wheel( elidx, wheelidx ), GLYPHS, default = get_device_default_glyphs() );
 	function get_wheel_font( elidx, wheelidx ) = find_value( get_wheel( elidx, wheelidx ), FONT, default = get_device_wheel_font() );
@@ -257,6 +257,7 @@ module MakeDevice( didx )
 	function get_wheel_glyph_count( elidx, wheelidx ) = len( get_wheel_glyphs( elidx, wheelidx ));
 	function get_wheel_glyph_distance_from_center( elidx, wheelidx ) = (WHEEL_RADIUS * cos( 180 / (get_wheel_glyph_count( elidx, wheelidx )) ) - GLYPH_THICKNESS);
 	function get_click_distance_from_center( elidx, wheelidx ) = -.65 * WHEEL_RADIUS;
+
 
 	CLICK_STRENGTH_MIN = 0.15;
 	CLICK_STRENGTH_MAX = 0.25;
@@ -272,7 +273,7 @@ module MakeDevice( didx )
 	function get_counter_extra_width( elidx, didx = didx ) = find_value( get_part( elidx ), EXTRA_WIDTH, default = get_device_default_extra_width( didx ) );
 	function get_counter_width( elidx, didx = didx ) = num_wheels_in_counter( elidx, didx ) * ( wheel_unit_width - BASE_ARM_THICKNESS ) + ( has_wheel(elidx, didx = didx ) ? BASE_ARM_THICKNESS : 0 ) + ( is_last_counter( elidx, didx = didx ) ? 0 : get_counter_extra_width( elidx = elidx, didx = didx ) );
 
-	function is_last_counter( elidx, didx = didx ) = num_counters( didx = didx, start = elidx + 1 ) == 0;
+	function is_last_counter( elidx, didx = didx ) = num_counters( didx, start = elidx + 1 ) == 0;
 
 
 	function get_part_position( didx = didx, stop, idx = 0, sum = 0 ) =
@@ -290,9 +291,11 @@ module MakeDevice( didx )
 			get_device_position( stop, didx + 1, sum + get_device_width( didx = didx ) + EXTRA_DISTANCE_BETWEEN_DEVICES  ) :
 			sum;
 
-	function get_base_font( elidx ) = find_value( get_part( elidx ), FONT, default = get_device_base_font() );
-	function get_base_label( elidx ) = find_value( get_part( elidx ), LABEL, default = "" );
-	function get_base_label_innie( elidx ) = find_value( get_part( elidx ), IS_BASE_INNIE, default = get_device_default_base_label_innie() );
+	function get_counter_base_font( elidx, didx = didx ) = find_value( get_part( elidx, didx ), FONT, default = get_device_base_font() );
+	function get_counter_base_label( elidx, didx = didx ) = find_value( get_part( elidx, didx ), LABEL, default = "" );
+	function get_counter_base_label_innie( elidx, didx = didx ) = find_value( get_part( elidx, didx ), IS_BASE_INNIE, default = get_device_default_base_label_innie() );
+	function is_counter_disabled( elidx, didx = didx ) = is_disabled( get_part( elidx, didx));
+	function get_counter_make_wheels( elidx, didx = didx ) = find_value( get_part( elidx, didx ), MAKE_WHEELS, default = true);
 
 
 	preview_translate = preview() ? [0,0,0] : [ 20,0,0];
@@ -319,7 +322,7 @@ module MakeDevice( didx )
 		}
 		else
 		{
-			translate( [ 0, WHEEL_RADIUS * 3 + (wheelidx + elidx ) * wheel_dist ,
+			translate( [ wheelidx, WHEEL_RADIUS * 1 + (wheelidx + elidx ) * wheel_dist ,
 			WHEEL_THICKNESS/2 ])
 			rotate([0,90,0])
 
@@ -335,11 +338,11 @@ module MakeDevice( didx )
 		linear_extrude(height = BASE_LABEL_DEPTH, scale = 1 ) 
 		rotate( [ 0,0,180])
 		text( 
-			text = get_base_label( elidx ), 
+			text = get_counter_base_label( elidx ), 
 			valign = "center", 
 			halign = "center", 
 			size = WHEEL_RADIUS/4.5 * 2,
-			font = get_base_font(elidx));
+			font = get_counter_base_font(elidx));
 	}
 
 	module MakeBaseForCounter( elidx )
@@ -354,13 +357,13 @@ module MakeDevice( didx )
 			
 
 			// label
-			if ( get_base_label_innie( elidx ) )
+			if ( get_counter_base_label_innie( elidx ) )
 				translate( [0,0, - BASE_LABEL_DEPTH ])
 				MakeBaseLabel( elidx );
 		}
 		
 		
-		if ( !get_base_label_innie( elidx ) )
+		if ( !get_counter_base_label_innie( elidx ) )
 			translate( [0,0, -0.1])
 				MakeBaseLabel( elidx );
 	}
@@ -455,6 +458,7 @@ module MakeDevice( didx )
 		even_num_sides = wheel_num_sides % 2;
 		click_dist =  get_click_distance_from_center(elidx, wheelidx);
 
+		if ( get_counter_make_wheels( elidx ))
 		difference()
 		{
 			// wheel

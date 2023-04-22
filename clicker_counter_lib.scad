@@ -1,3 +1,11 @@
+// Copyright 2023 Ido Magal
+//
+// Released under the Creative Commons - Attribution - Non-Commercial - Share Alike License.
+// https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+
+VERSION = "1.00";
+COPYRIGHT_INFO = "\tClicker Counter\n\thttps://github.com/dppdppd/clicker_counter\n\n\tCopyright 2023 Ido Magal\n\tCreative Commons - Attribution - Non-Commercial - Share Alike.\n\thttps://creativecommons.org/licenses/by-nc-sa/4.0/legalcode";
+
 
 GLYPHS = "GLYPHS";
 FONT = "FONT";
@@ -61,10 +69,10 @@ TOLERANCE = 0.1;
 EXTRA_DISTANCE_BETWEEN_DEVICES = WHEEL_RADIUS;
 
 
-dbg_wheel = "";
+dbg_wheel = "clear";
 dbg_basemain = "";
 dbg_baseballs = "";
-dgb_crosssection = true;
+dgb_crosssection = false;
 
 // key-values helpers
 
@@ -99,7 +107,7 @@ function get_device( didx ) = get_element( DATA, didx );
 module DbgRender( test )
 {
     if ( preview() && test == "clear" )
-   		color( [0,1,0], alpha = 0.2)
+   		color( [1,1,1], alpha = 0.5)
  		children();
     else if ( preview() && test == "off" )
     	* children();
@@ -125,6 +133,8 @@ Main();
 
 module Main()
 {
+	    echo( str( "\n\n\n", COPYRIGHT_INFO, "\n\n\tVersion ", VERSION, "\n\n" ));
+
 	for( didx = [ 0: num_elements( DATA ) - 1 ] )
 	{	
 		MakeDevice( didx );
@@ -148,18 +158,17 @@ module MakeDevice( didx )
 				{		
 					if ( is_counter( elidx ) && !is_counter_disabled( elidx, didx ))
 					{
+					//	echo( str("-- counter ", elidx ));
+
 						// look for wheels
 						if ( num_wheels_in_counter( elidx = elidx ) > 0)
 						{
+							// echo( str("---- num wheels: ", num_wheels_in_counter( elidx = elidx ) ));
 							for( idx = [ 0: num_elements( get_part( elidx, didx = didx ) ) - 1] )
 							{
 								if (get_device_make_wheels() && is_wheel( elidx, idx ))
 								{            
 									wheelidx = get_wheelidx( elidx, idx);
-									
-									// echo( get_part_subpart( elidx, idx, didx ) );
-									// echo( get_wheel( elidx, wheelidx));
-
 									if ( !is_wheel_disabled(elidx, wheelidx, didx))
 									{
 										DbgRender( dbg_wheel )
@@ -234,10 +243,10 @@ module MakeDevice( didx )
 	function has_wheel( elidx, didx = didx ) = num_wheels_in_counter( elidx, didx = didx ) > 0;
 	function num_wheels_in_counter( elidx, didx = didx ) = count_keys( get_part( elidx, didx ), WHEEL );
 	function get_wheelidx( elidx, idx ) = count_keys( get_part( elidx ), WHEEL, stop = idx );
-	function get_wheel( elidx, wheelidx, didx = didx, idx = 0, wheelcount = 0 ) =
-		wheelidx > wheelcount ?
-		get_wheel( elidx, wheelidx, didx, idx + 1, wheelcount + ( is_wheel( elidx, idx)  ? 1 : 0 )) :
-		get_part_subpart( elidx, idx, didx );
+	function get_wheel(elidx, wheelidx, didx = didx, idx = 0, ) =
+		is_wheel( elidx, idx ) && get_wheelidx( elidx, idx) == wheelidx ?
+			get_part_subpart( elidx, idx, didx ) :
+			get_wheel(elidx, wheelidx, didx = didx, idx = idx + 1 );
 
 	function num_wheels_in_device( didx = didx, elidx = 0, sum = 0 ) =
 	//	echo( "numwhels", "didx",didx,"elidx", elidx  )
@@ -256,18 +265,29 @@ module MakeDevice( didx )
 	function get_wheel_glyph_innie( elidx, wheelidx ) = find_value( get_wheel( elidx, wheelidx ), IS_WHEEL_INNIE, default = get_device_default_is_wheel_innie() );
 	function get_wheel_glyph_count( elidx, wheelidx ) = len( get_wheel_glyphs( elidx, wheelidx ));
 	function get_wheel_glyph_distance_from_center( elidx, wheelidx ) = (WHEEL_RADIUS * cos( 180 / (get_wheel_glyph_count( elidx, wheelidx )) ) - GLYPH_THICKNESS);
-	function get_click_distance_from_center( elidx, wheelidx ) = -.65 * WHEEL_RADIUS;
+
+	function wheel_size_to_click_distance( g) = 	g == 4 ? 0.45 : 
+													g == 5 ? 0.47 : 
+													g == 6 ? 0.49 : 
+													g == 7 ? 0.51 : 
+													g == 8 ? 0.53 : 
+													g == 9 ? 0.55 : 
+													g == 10 ? 0.57 : // ideal value
+													g == 11 ? 0.63 : 
+													g >= 12 ? 0.7 : 0.57;																																																																																					
+
+	function get_click_distance_from_center( elidx, wheelidx ) = WHEEL_RADIUS * wheel_size_to_click_distance( get_wheel_glyph_count( elidx, wheelidx ));
 
 
-	CLICK_STRENGTH_MIN = 0.15;
-	CLICK_STRENGTH_MAX = 0.25;
+	CLICK_STRENGTH_MIN = 0.3;//0.17;
+	CLICK_STRENGTH_MAX = 0.6;//;
 	click_strength_range = CLICK_STRENGTH_MAX - CLICK_STRENGTH_MIN;
 	click_strength_steps = 4;
 	click_strength_delta = click_strength_range / click_strength_steps;
 	click_strength_avg = (CLICK_STRENGTH_MAX + CLICK_STRENGTH_MIN)/2;
 
 	function click_strength_to_scale( strength ) = strength * click_strength_delta + click_strength_avg ;
-	function get_wheel_click_strength( elidx, wheelidx ) = click_strength_to_scale( find_value( get_wheel( elidx, wheelidx), CLICK_STRENGTH, default = get_device_default_click_strength() ));
+	function get_counter_click_strength( elidx ) = click_strength_to_scale( find_value( get_part( elidx), CLICK_STRENGTH, default = get_device_default_click_strength() ));
 
 	function get_part_width( elidx, didx = didx ) = is_counter( elidx, didx ) ? get_counter_width( elidx, didx ) : 0;
 	function get_counter_extra_width( elidx, didx = didx ) = find_value( get_part( elidx ), EXTRA_WIDTH, default = get_device_default_extra_width( didx ) );
@@ -317,6 +337,7 @@ module MakeDevice( didx )
 
 		if ( preview() )
 		{
+			rotate([21,0,0])
 			translate( [this_wheel_pos,  0 ])
 			children();
 		}
@@ -324,7 +345,7 @@ module MakeDevice( didx )
 		{
 			translate( [ wheelidx, WHEEL_RADIUS * 1 + (wheelidx + elidx ) * wheel_dist ,
 			WHEEL_THICKNESS/2 ])
-			rotate([0,90,0])
+			rotate([0,-90,0])
 
 			children();		
 		}
@@ -410,33 +431,41 @@ module MakeDevice( didx )
 		DbgRender( dbg_baseballs )
 		translate([-BASE_ARM_THICKNESS - WHEEL_THICKNESS/2 - 2*TOLERANCE,0,0])
 		{
-			translate( [  ( WHEEL_THICKNESS/2 + 2*TOLERANCE   ) ,0,0])
-			Balls( elidx, wheelidx, axle = true, click = true);
+			MakeAxle( elidx);
+			MakeClicker( elidx, wheelidx);
 
 			mirror( [1,0,0])
-			translate( [  ( WHEEL_THICKNESS/2 + 2*TOLERANCE ) ,0,0])
-			Balls( elidx, wheelidx, axle = true, click = true);
+			{
+				MakeAxle( elidx);
+				MakeClicker( elidx, wheelidx );
+			}
 		}
 	}
 
-	module Balls( elidx, wheelidx, axle = true, click = false)
+	module MakeClicker( elidx, wheelidx )
 	{
 		click_dist = get_click_distance_from_center( elidx, wheelidx );
-		// click click
-		if ( click )
+			angle = -33;
+
+		translate( [  ( WHEEL_THICKNESS/2 + 2*TOLERANCE   ) ,0,0])
 		hull()
 		{
-			rotate( [-30,0,0])
+			angle = -33;
+			rotate( [angle,0,0])
 			translate( [-TOLERANCE * 1.5,0,click_dist])
-			Ball( diameter = WHEEL_CLICK_DETENT_DIAMETER, scale = get_wheel_click_strength( elidx, wheelidx ) );
+			Ball( diameter = WHEEL_CLICK_DETENT_DIAMETER, scale = get_counter_click_strength( elidx ) );
 
-			rotate( [-30,0,0])
+			rotate( [angle,0,0])
 			translate( [0,0,click_dist])
 			rotate([0,-90,0])
-			cylinder( d = WHEEL_CLICK_DETENT_DIAMETER, h = 0.01, center = true );
-		}
+			cylinder( d = WHEEL_CLICK_DETENT_DIAMETER*1.2, h = 0.01, center = true );
+		}		
+	}
 
+	module MakeAxle( elidx)
+	{
 		// axle
+		translate( [  ( WHEEL_THICKNESS/2 + 2*TOLERANCE   ) ,0,0])
 		translate( [ 0.01,0,0])
 		difference()
 		{
@@ -453,10 +482,12 @@ module MakeDevice( didx )
 
 	module MakeWheel ( elidx, wheelidx )
 	{
+		// echo(get_wheel( elidx, wheelidx ), get_wheel_glyphs( elidx, wheelidx ));
+
 		wheel_num_sides = get_wheel_glyph_count( elidx, wheelidx );
 		wheel_angle = 360 / wheel_num_sides;
 		even_num_sides = wheel_num_sides % 2;
-		click_dist =  get_click_distance_from_center(elidx, wheelidx);
+		click_dist =  get_click_distance_from_center(elidx, wheelidx );
 
 		if ( get_counter_make_wheels( elidx ))
 		difference()
@@ -475,19 +506,32 @@ module MakeDevice( didx )
 			circle( d = WHEEL_AXLE_DIVOT_DIAMETER + TOLERANCE);                
 			
 			// click divots
-			for ( side=[0 : wheel_num_sides - 1 ])
-			{
-				angle = side * wheel_angle + (even_num_sides ? 0 : wheel_angle/2);
-				rotate([angle, 0, 0])
-				translate( [0,0, click_dist])
-				rotate( [ 0,90,0])
-				linear_extrude(height = WHEEL_THICKNESS, center = true) 
-				circle( d = WHEEL_CLICK_DIVOT_DIAMETER);                
-			}     
+		
+			MakeClickerDivots();
+
+			mirror([1,0,0])
+			MakeClickerDivots();
 		}
 
 		if ( !get_wheel_glyph_innie( elidx, wheelidx) )
 			MakeWheelGlyphs( elidx, wheelidx, innie = false );
+
+	module MakeClickerDivots()
+	{
+		divot_depth = WHEEL_THICKNESS * .3;
+
+		//translate( [WHEEL_THICKNESS/2 - divot_depth + 0.01,0,0])
+		for ( side=[0 : wheel_num_sides - 1 ])
+		{
+			angle = side * wheel_angle + (even_num_sides ? 0 : wheel_angle/2);
+			rotate([angle, 0, 0])
+			translate( [0,0, click_dist])
+			rotate( [ 0,90,0])
+			// cylinder(h=divot_depth, r1 = 0, r2= WHEEL_CLICK_DIVOT_DIAMETER/2+0.4,center = false);
+			cylinder(h=WHEEL_THICKNESS, r1 = WHEEL_CLICK_DIVOT_DIAMETER/2, r2= WHEEL_CLICK_DIVOT_DIAMETER/2,center = false);            
+		}  		
+	}
+
 
 	}
 
@@ -618,8 +662,8 @@ module BaseUpperPolygon()
     polygon( points = [
         [BASE_MIN_Z, -WHEEL_RADIUS * 1.3],
         [BASE_MIN_Z, -WHEEL_RADIUS * 0.3],
-        [ WHEEL_RADIUS * 0.76, WHEEL_RADIUS * 0.53],
-        [ WHEEL_RADIUS * 0.83, WHEEL_RADIUS * 0.40]		
+        [ WHEEL_RADIUS * 0.71, WHEEL_RADIUS * 0.61],
+        [ WHEEL_RADIUS * 0.84, WHEEL_RADIUS * 0.41]		
     ]);
 }
 

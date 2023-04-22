@@ -6,7 +6,10 @@ DATA =
 	[DEVICE,
 
 		[COUNTER,
-			[ WHEEL, ["A","b","3","y","n"]	],
+			[ WHEEL, 
+				[GLYPHS, ["1","2","3","4","5"]	]
+			],
+	
 		]
 	],
 ];

@@ -10,7 +10,7 @@ DATA =
 	[DEVICE,
 		
 		// [ DISABLED, true],
-		[ MAKE_WHEELS, false ],
+		// [ MAKE_WHEELS, false ],
 		// [ MAKE_BASE, false ],
 
 
@@ -38,7 +38,7 @@ DATA =
 		
 	],
 	[DEVICE,
-		[ MAKE_WHEELS, false ],
+		// [ MAKE_WHEELS, false ],
 
 		[COUNTER,
 			
@@ -71,7 +71,7 @@ DATA =
 
 	[DEVICE,  // ENEMY HP
 		
-		[ DISABLED, true],
+		// [ DISABLED, true],
 		// [ MAKE_WHEELS, false ],
 		
 		[COUNTER,

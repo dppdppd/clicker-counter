@@ -4,7 +4,7 @@
 // https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
 
 VERSION = "1.00";
-COPYRIGHT_INFO = "\tClicker Counter\n\thttps://github.com/dppdppd/clicker_dial\n\n\tCopyright 2023 Ido Magal\n\tCreative Commons - Attribution - Non-Commercial - Share Alike.\n\thttps://creativecommons.org/licenses/by-nc-sa/4.0/legalcode";
+COPYRIGHT_INFO = "\tClicker Counter\n\thttps://github.com/dppdppd/clicker_counter\n\n\tCopyright 2023 Ido Magal\n\tCreative Commons - Attribution - Non-Commercial - Share Alike.\n\thttps://creativecommons.org/licenses/by-nc-sa/4.0/legalcode";
 
 
 GLYPHS = "GLYPHS";

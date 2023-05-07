@@ -1,7 +1,10 @@
-# clicker_counter
+# clicker_dial
 
 I wanted a compact general purpose counter that will fit in the game box and will hold its position.
 
-Print at a maximum of 0.10.
+Should be printed at 0.10mm or smaller.
 
 See /builds/examples/ for, well, examples.
+
+
+![iron helm set](images/iron_helm.jpg)

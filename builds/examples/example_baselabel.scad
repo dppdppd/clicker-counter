@@ -1,5 +1,4 @@
-
-include <../../clicker_counter_lib.scad>
+include <../../clicker_dial_lib.scad>
 
 DATA =
 [
@@ -11,6 +10,4 @@ DATA =
 			[ LABEL, "HP"]
 		]
 	],
-];
-
-Main(); 
+]; 

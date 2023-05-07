@@ -4,7 +4,7 @@
 // https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
 
 VERSION = "1.00";
-COPYRIGHT_INFO = "\tClicker Counter\n\thttps://github.com/dppdppd/clicker_counter\n\n\tCopyright 2023 Ido Magal\n\tCreative Commons - Attribution - Non-Commercial - Share Alike.\n\thttps://creativecommons.org/licenses/by-nc-sa/4.0/legalcode";
+COPYRIGHT_INFO = "\tClicker Counter\n\thttps://github.com/dppdppd/clicker_dial\n\n\tCopyright 2023 Ido Magal\n\tCreative Commons - Attribution - Non-Commercial - Share Alike.\n\thttps://creativecommons.org/licenses/by-nc-sa/4.0/legalcode";
 
 
 GLYPHS = "GLYPHS";
@@ -69,7 +69,7 @@ TOLERANCE = 0.1;
 EXTRA_DISTANCE_BETWEEN_DEVICES = WHEEL_RADIUS;
 
 
-dbg_wheel = "clear";
+dbg_wheel = "";
 dbg_basemain = "";
 dbg_baseballs = "";
 dgb_crosssection = false;
@@ -279,8 +279,8 @@ module MakeDevice( didx )
 	function get_click_distance_from_center( elidx, wheelidx ) = WHEEL_RADIUS * wheel_size_to_click_distance( get_wheel_glyph_count( elidx, wheelidx ));
 
 
-	CLICK_STRENGTH_MIN = 0.3;//0.17;
-	CLICK_STRENGTH_MAX = 0.6;//;
+	CLICK_STRENGTH_MIN = 0.4;
+	CLICK_STRENGTH_MAX = 0.6;
 	click_strength_range = CLICK_STRENGTH_MAX - CLICK_STRENGTH_MIN;
 	click_strength_steps = 4;
 	click_strength_delta = click_strength_range / click_strength_steps;

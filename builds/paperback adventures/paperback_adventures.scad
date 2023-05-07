@@ -1,12 +1,10 @@
 include <../../clicker_dial_lib.scad>
 
-
 WHEEL_DIAMETER = 16;
-
 
 DATA = 
 [
-	[DEVICE,
+	[DEVICE,	//player
 		
 		// [ DISABLED, true],
 		// [ MAKE_WHEELS, false ],
@@ -30,55 +28,28 @@ DATA =
 			
 			[ WHEEL, []],
 			[ WHEEL, []],
-			[ LABEL, "NRG"],
+			[ LABEL, "M"],
 			// [ MAKE_WHEELS, false ],
 
 		],
-		
-	],
-	[DEVICE,
-		// [ MAKE_WHEELS, false ],
 
-		[COUNTER,
+		[COUNTER,	// ENERGY
 			
 			[ WHEEL, []],
 			[ WHEEL, []],
-			[ LABEL, "GOLD"],
-			// [ MAKE_WHEELS, false ],
-
-
-		],	
-
-		[COUNTER,
-			
-			[ WHEEL, []],
-			[ LABEL, "P"],
-			// [ MAKE_WHEELS, false ],
-
-
-		],
-
-		[COUNTER,
-			
-			[ WHEEL, []],
-			[ LABEL, "R"],
+			[ LABEL, "B"],
 			// [ MAKE_WHEELS, false ],
 
 		],
-		
+
+		[COUNTER,	// ENERGY
+			
+			[ WHEEL, []],
+			[ WHEEL, []],
+			[ LABEL, "H"],
+			// [ MAKE_WHEELS, false ],
+
+		],		
 	],
 
-	[DEVICE,  // ENEMY HP
-		
-		// [ DISABLED, true],
-		// [ MAKE_WHEELS, false ],
-		
-		[COUNTER,
-			
-			[ WHEEL, []],
-			[ WHEEL, []],
-			[ LABEL, "NME"],
-		],
-	]
 ];
-

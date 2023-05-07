@@ -1,4 +1,6 @@
 builds/*
 !builds/examples
 !builds/iron helm
+!builds/paperback adventures
+
 *.stl
